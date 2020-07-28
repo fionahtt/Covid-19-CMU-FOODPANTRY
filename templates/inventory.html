@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory{% endblock %}
+{% block page %}Inventory{% endblock %}
+
+{% block content %}
+    <h5>Add/Edit Items</h5><br>
+    <form action = "#" method = "post">
+        <label>Item:</label>
+        <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
+        <label>Amount:</label>
+        <input type = "number" name = "Amount" min = "1" max = 100><br><br>
+        <input type = "submit" name = "Submit">
+    </form><br><br>
+
+    <h5>Inventory</h5>
+    <table>
+        <tr>
+            <th>Item</th>
+            <th colspan = "2">Amount</th>
+        </tr>
+        {% for item in values %}
+            <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.amount}}</td>
+                <td>put a link to edit amounts of items</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

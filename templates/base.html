@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang = "en">
+
+<head>
+    <meta charset = "utf-8" />
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename = 'css/materialize.min.css')}}"  media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <meta name = "author" content = "Sara Song" />
+    <meta name = "description" content = "CIP Flask Test File" />
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <header>
+        <h1>Test Flask Website</h1>
+        <h3>{% block page %}{% endblock %}</h3>
+    </header>
+
+    <nav>
+        <a href = "/">Home</a>
+        <a href = "inventory">Inventory</a>
+    </nav>
+    <div class = "container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+</body>
+
+</html>
