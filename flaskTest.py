@@ -17,30 +17,55 @@ class Inventory(database.Model):
         self.name = name
         self.amount = amount
 
+#Haven't made yet
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+#Helper function: Goes thru inventory database and returns a list where items are
+# sorted by amount, least to most
+#Called in inventory page whenever inventory.html is rendered
+def sortInventory():
+    inventoryList = Inventory.query.all()
+    sortedAmounts = []
+    #Create a list just for the amounts of all items in database
+    for item in inventoryList:
+        sortedAmounts.append(item.amount)
+    sortedAmounts = sorted(sortedAmounts)
+    #Go thru database again and...
+    for item in inventoryList:
+        amount = item.amount
+        #Find where item is located in sorted list
+        amountIndex = sortedAmounts.index(amount)
+        #Add database item to that spot in the sorted list
+        sortedAmounts.insert(amountIndex, item)
+        #Remove the amount in the list
+        sortedAmounts.pop(amountIndex+1)
+    return sortedAmounts
+
+
+#Sort by alphabetical name or small>large amount??
 @app.route("/inventory", methods = ["POST", "GET"])
 def inventory():
     if request.method == "POST":
         item = request.form["Item"].title()
         amount = request.form["Amount"]
-
         #Check to see if item already exists in database
         foundItem = Inventory.query.filter_by(name = item).first()
+        #If item already exists or user didn't enter an amount:
         if foundItem or amount == "": 
             Inventory.query.filter_by(name = item).delete()
             #If user didn't enter an amount, delete entry
             if amount == "": 
+                #commit changes to database and return the inventory template
                 database.session.commit()
-                return render_template("inventory.html", values = Inventory.query.all())
-                
+                return render_template("inventory.html", values = sortInventory())
+        #Add info user entered into form to database
         newEntry = Inventory(item, amount)
         database.session.add(newEntry)
         database.session.commit()
-    return render_template("inventory.html", values = Inventory.query.all())
+    return render_template("inventory.html", values = sortInventory())
 
 
 if __name__ == "__main__":
