@@ -12,10 +12,24 @@ class Inventory(database.Model):
     _id = database.Column("id", database.Integer, primary_key = True)
     name = database.Column(database.String(100))
     amount = database.Column(database.Integer)
+    #Food categories, "on" if applicable, "" if not
+    grain = database.Column(database.String(2))
+    produce = database.Column(database.String(2))
+    dairy = database.Column(database.String(2))
+    snacks = database.Column(database.String(2))
+    vegan = database.Column(database.String(2))
+    vegetarian = database.Column(database.String(2))
+
     #maybe add image later on somehow?
-    def __init__(self, name, amount):
+    def __init__(self, name, amount, grain, produce, dairy, snacks, vegan, vegetarian):
         self.name = name
         self.amount = amount
+        self.grain = grain
+        self.produce = produce
+        self.dairy = dairy
+        self.snacks = snacks
+        self.vegan = vegan
+        self.vegetarian = vegetarian
 
 #Haven't made yet
 @app.route("/")
@@ -51,6 +65,26 @@ def inventory():
     if request.method == "POST":
         item = request.form["Item"].title()
         amount = request.form["Amount"]
+        grain = ""
+        produce = ""
+        dairy = ""
+        snacks = ""
+        vegan = ""
+        vegetarian = ""
+
+        if "Grain" in request.form:
+            grain = "on"
+        if "Produce" in request.form:
+            produce = "on"
+        if "Dairy" in request.form:
+            dairy = "on"
+        if "Snacks" in request.form:
+            snacks = "on"
+        if "Vegan" in request.form:
+            vegan = "on"
+        if "Vegetarian" in request.form:
+            vegetarian = "on"
+
         #Check to see if item already exists in database
         foundItem = Inventory.query.filter_by(name = item).first()
         #If item already exists or user didn't enter an amount:
@@ -62,7 +96,7 @@ def inventory():
                 database.session.commit()
                 return render_template("inventory.html", values = sortInventory())
         #Add info user entered into form to database
-        newEntry = Inventory(item, amount)
+        newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
         database.session.add(newEntry)
         database.session.commit()
     return render_template("inventory.html", values = sortInventory())
