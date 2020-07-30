@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+
+{% block content %}
+    <h4>Add/Edit Items</h4><br>
+    <form action = "#" method = "post">
+        <label>Item:</label>
+        <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
+        <label>Amount:</label>
+        <input type = "number" name = "Amount" min = "1" max = 100><br><br>
+        <input type = "submit" name = "Submit">
+    </form><br><br>
+
+    <h4>Inventory</h4>
+    <table class = "striped">
+        <tr>
+            <th>Item</th>
+            <th>Amount</th>
+        </tr>
+        {% for item in values %}
+            <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.amount}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
