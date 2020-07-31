@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block nav %}
+<li><a href="/">Home</a></li>
+<li class = "active"><a href="inventory">Inventory</a></li>
+{% endblock %}
+
+{% block content %}
+    <h4>Add/Edit Items</h4><br>
+    <form action = "#" method = "post">
+        <label>Item:</label>
+        <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
+        <label>Amount:</label>
+        <input type = "number" name = "Amount" min = "1" max = 100><br><br>
+
+        <label>Category (check all that apply)</label>
+        <p>
+            <label>
+              <input type="checkbox" class="filled-in" name = "Grain"/>
+              <span>Grain</span>
+            </label>
+        </p>
+        <p>
+            <label>
+              <input type="checkbox" class="filled-in" name = "Produce"/>
+              <span>Produce</span>
+            </label>
+        </p>
+        <p>
+            <label>
+                <input type = "checkbox" class = "filled-in" name = "Dairy"/>
+                <span>Dairy</span>
+            </label>
+        </p>
+        <p>
+            <label>
+              <input type="checkbox" class="filled-in" name = "Snacks"/>
+              <span>Snacks</span>
+            </label>
+        </p>
+        <p>
+            <label>
+              <input type="checkbox" class="filled-in" name = "Vegan"/>
+              <span>Vegan</span>
+            </label>
+        </p>
+        <p>
+            <label>
+              <input type="checkbox" class="filled-in" name = "Vegetarian"/>
+              <span>Vegetarian</span>
+            </label>
+        </p>
+        
+
+        <input type = "submit" name = "Submit">
+    </form><br><br>
+
+    <h4>Inventory</h4>
+
+    <!-- HEELLLLPPPP DUNNO HOW TO MAKE THIS WORK -->
+    <!-- Dropdown Trigger -->
+    <a class='dropdown-trigger btn-small' href='#' data-target='dropdown1'>Filter By:</a>
+
+    <!-- Dropdown Structure -->
+    <ul id='dropdown1' class='dropdown-content'>
+        <li><a href="#!">Grain</a></li>
+        <li><a href="#!">Produce</a></li>
+        <li><a href="#!">Dairy</a></li>
+        <li><a href="#!">Snacks</a></li>
+        <li><a href="#!">Vegan</a></li>
+        <li><a href="#!">Vegetarian</a></li>
+    </ul>
+
+
+    <table class = "striped">
+        <tr>
+            <th>Item</th>
+            <th>Amount</th>
+        </tr>
+        {% for item in values %}
+            <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.amount}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

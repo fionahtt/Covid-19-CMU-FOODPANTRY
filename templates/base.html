@@ -36,10 +36,14 @@
                 
         </div>
 
+
+    <!-- Trying to make the mobile hamburger collapse nav bar thing in materialize, dunno how to make it work yet -->
+
     <nav>
         <div class="nav-wrapper">
             <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="left hide-on-med-and-down">
+
                 {% if auth %}
                     {% include "staff_nav.html" %} 
                 {% else %}
@@ -50,10 +54,14 @@
         </div>
     </nav>
     <ul class="sidenav" id="mobile-demo">
+
         <li><a href="sass.html">Sass</a></li>
         <li><a href="badges.html">Components</a></li>
         <li><a href="collapsible.html">Javascript</a></li>
         <li><a href="mobile.html">Mobile</a></li>
+
+        <li><a href="/">Home</a></li>
+        <li><a href="inventory">Inventory</a></li>
     </ul>
 
 
