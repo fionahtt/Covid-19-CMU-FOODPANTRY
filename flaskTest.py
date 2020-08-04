@@ -65,10 +65,9 @@ def register():
 #Helper function: Goes thru inventory database and returns a list where items are
 # sorted by amount, least to most
 #Called in inventory page whenever inventory.html is rendered
-def sortInventory():
-    inventoryList = Inventory.query.all()
-    sortedAmounts = []
+def sortInventoryByAmount(inventoryList):
     #Create a list just for the amounts of all items in database
+    sortedAmounts = []
     for item in inventoryList:
         sortedAmounts.append(item.amount)
     sortedAmounts = sorted(sortedAmounts)
@@ -82,6 +81,23 @@ def sortInventory():
         #Remove the amount in the list
         sortedAmounts.pop(amountIndex+1)
     return sortedAmounts
+
+
+#Helper function: Goes thru inventory database and returns a list w/ only the items
+# in the given category. For example, calling sortInventoryByCategory("vegan") returns
+# a list of all the vegan items in the inventory database
+def sortInventoryByCategory(category):
+    inventoryList = Inventory.query.all()
+    #Create a list for all items in given category
+    categoryList = []
+    for item in inventoryList:
+        #Converts the string parameter (ex: 'dairy') to an item attribute (ex: item.dairy)
+        # Will be either 'on' if it's under the category, or an empty string '' if not
+        onOff = getattr(item, category)
+        if onOff == "on":
+            categoryList.append(item)
+    categoryList = sortInventoryByAmount(categoryList)
+    return categoryList
 
 
 #Sort by alphabetical name or small>large amount??
@@ -121,12 +137,12 @@ def inventory():
                 #commit changes to database and return the inventory template
                 database.session.commit()
 
-                return render_template("staff_inventory.html", values = sortInventory(), auth=verify_staff(), user="Alex")
+                return render_template("staff_inventory.html", values = sortInventoryByAmount(Inventory.query.all()), auth=verify_staff(), user="Alex")
         #Add info user entered into form to database
         newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
         database.session.add(newEntry)
         database.session.commit()
-    return render_template("staff_inventory.html", values = sortInventory(), auth=verify_staff(), user="Alex")
+    return render_template("staff_inventory.html", values = sortInventoryByAmount(Inventory.query.all()), auth=verify_staff(), user="Alex")
 
 if __name__ == "__main__":
     database.create_all()
