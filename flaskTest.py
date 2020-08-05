@@ -83,6 +83,20 @@ def sortInventoryByAmount(inventoryList):
     return sortedAmounts
 
 
+#Might just make sortInventoryByAmount and sortInventoryByAlphabetical one function later
+def sortInventoryByAlphabetical(inventoryList):
+    sortedNames = []
+    for item in inventoryList:
+        sortedNames.append(item.name)
+    sortedNames = sorted(sortedNames)
+    for item in inventoryList:
+        name = item.name
+        nameIndex = sortedNames.index(name)
+        sortedNames.insert(nameIndex, item)
+        sortedNames.pop(nameIndex+1)
+    return sortedNames
+
+
 #Helper function: Goes thru inventory database and returns a list w/ only the items
 # in the given category. For example, calling sortInventoryByCategory("vegan") returns
 # a list of all the vegan items in the inventory database
