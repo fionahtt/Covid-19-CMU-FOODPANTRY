@@ -82,19 +82,27 @@
 
 
         <table class = "striped">
-            <tr>
-                <th>Item</th>
-                <th>Amount</th>
-            </tr>
-            {% for item in values %}
+            <thead>
                 <tr>
-                    <td>{{item.name}}</td>
-                    <td>{{item.amount}}</td>
+                    <th>Item</th>
+                    <th>Amount</th>
                 </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+                {% for item in values %}
+                    <tr>
+                        <td>{{item.name}}</td>
+                        <!-- Add feature to add/subtract items from inventory here -->
+                        <td>{{item.amount}}</td>
+                        <!-- Maybe use a javascript function triggered by onmousedown here? -->
+                        <td><a>Edit</a></td>
+                        <td><a>Remove</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 
-    
+
 
 {% endblock %}
