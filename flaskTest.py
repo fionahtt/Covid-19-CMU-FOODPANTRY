@@ -97,27 +97,20 @@ def sortInventoryByAlphabetical(inventoryList):
     return sortedNames
 
 
-#Helper function: Goes thru inventory database and returns a list w/ only the items
-# in the given category. For example, calling sortInventoryByCategory("vegan") returns
-# a list of all the vegan items in the inventory database
+#Uses a builtin sqlalchemy command to return a list of only the items under the given category
 def sortInventoryByCategory(category):
     inventoryList = Inventory.query.all()
-    #Create a list for all items in given category
-    categoryList = []
-    for item in inventoryList:
-        #Converts the string parameter (ex: 'dairy') to an item attribute (ex: item.dairy)
-        # Will be either 'on' if it's under the category, or an empty string '' if not
-        onOff = getattr(item, category)
-        if onOff == "on":
-            categoryList.append(item)
-    categoryList = sortInventoryByAmount(categoryList)
-    return categoryList
+    categoryDictionary = {category: "on"}
+    result = Inventory.query.filter_by(**categoryDictionary).all()
+    return result
 
 
 #Sort by alphabetical name or small>large amount??
 @app.route("/inventory", methods = ["POST", "GET"])
 def inventory():
     if request.method == "POST":
+        #print(request.form)
+        #print("Vegetarian" in request.form)
         item = request.form["Item"].title()
         amount = request.form["Amount"]
 
