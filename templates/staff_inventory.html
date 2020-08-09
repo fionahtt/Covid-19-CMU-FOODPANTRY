@@ -5,17 +5,15 @@
 {% block nav %}
 <li><a href="/">Home</a></li>
 <li class = "active"><a href="inventory">Inventory</a></li>
-<li><a href="users">Users</a></li>
-<li><a href="orders">Orders</a></li>
 {% endblock %}
 
 {% block content %}
     <h4>Add/Edit Items</h4><br>
     <form action = "#" method = "post">
         <label>Item:</label>
-        <input type = "text" name = "Item" size = "25" placeholder = "Item Name" required><br><br>
+        <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
         <label>Amount:</label>
-        <input type = "number" name = "Amount" min = "1" placeholder = "Amount"><br><br>
+        <input type = "number" name = "Amount" min = "1" max = 100><br><br>
 
         <label>Category (check all that apply)</label>
         <p>
@@ -58,28 +56,43 @@
         <input type = "submit" name = "Submit">
     </form><br><br>
 
-    <div class="divider"></div>
+    <h4>Inventory</h4>
 
+<<<<<<< Updated upstream
+    <!-- HEELLLLPPPP DUNNO HOW TO MAKE THIS WORK -->
+    <!-- Dropdown Trigger -->
+    <a class='dropdown-trigger btn-small' href='#' data-target='dropdown1'>Filter By:</a>
+
+    <!-- Dropdown Structure -->
+    <ul id='dropdown1' class='dropdown-content'>
+        <li><a href="#!">Grain</a></li>
+        <li><a href="#!">Produce</a></li>
+        <li><a href="#!">Dairy</a></li>
+        <li><a href="#!">Snacks</a></li>
+        <li><a href="#!">Vegan</a></li>
+        <li><a href="#!">Vegetarian</a></li>
+    </ul>
+=======
     <div class = "section">
         <div class = "row">
             <div class = "col s3">
                 <h4>Inventory</h4>
             </div></br>
             <!-- HEELLLLPPPP DUNNO HOW TO MAKE THIS WORK -->
+
+	    <!-- Dropdown Structure -->
+            <ul id="dropdown" class="dropdown-content">
+            	<li><a href="#!">Grain</a></li>
+            	<li><a href="#!">Produce</a></li>
+            	<li><a href="#!">Dairy</a></li>
+            	<li><a href="#!">Snacks</a></li>
+            	<li><a href="#!">Vegan</a></li>
+            	<li><a href="#!">Vegetarian</a></li>
+            </ul>
             <!-- Dropdown Trigger -->
 
-            <a class='dropdown-trigger btn-small col s2 offset-s7' href='#' data-activates='dropdown1'>Filter By:</a>
+            <a class="dropdown-button btn" href="#" data-activates="dropdown">Filter By:</a>
         </div>
-
-        <!-- Dropdown Structure -->
-        <ul id='dropdown1' class='dropdown-content'>
-            <li><a href="#!">Grain</a></li>
-            <li><a href="#!">Produce</a></li>
-            <li><a href="#!">Dairy</a></li>
-            <li><a href="#!">Snacks</a></li>
-            <li><a href="#!">Vegan</a></li>
-            <li><a href="#!">Vegetarian</a></li>
-        </ul>
 
 
         <table class = "striped">
@@ -103,7 +116,20 @@
             </tbody>
         </table>
     </div>
+>>>>>>> Stashed changes
 
 
+    <table class = "striped">
+        <tr>
+            <th>Item</th>
+            <th>Amount</th>
+        </tr>
+        {% for item in values %}
+            <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.amount}}</td>
+            </tr>
+        {% endfor %}
+    </table>
 
 {% endblock %}
