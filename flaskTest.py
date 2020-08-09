@@ -65,10 +65,9 @@ def register():
 #Helper function: Goes thru inventory database and returns a list where items are
 # sorted by amount, least to most
 #Called in inventory page whenever inventory.html is rendered
-def sortInventory():
-    inventoryList = Inventory.query.all()
-    sortedAmounts = []
+def sortInventoryByAmount(inventoryList):
     #Create a list just for the amounts of all items in database
+    sortedAmounts = []
     for item in inventoryList:
         sortedAmounts.append(item.amount)
     sortedAmounts = sorted(sortedAmounts)
@@ -84,10 +83,34 @@ def sortInventory():
     return sortedAmounts
 
 
-#Sort by alphabetical name or small>large amount??
+#Might just make sortInventoryByAmount and sortInventoryByAlphabetical one function later
+def sortInventoryByAlphabetical(inventoryList):
+    sortedNames = []
+    for item in inventoryList:
+        sortedNames.append(item.name)
+    sortedNames = sorted(sortedNames)
+    for item in inventoryList:
+        name = item.name
+        nameIndex = sortedNames.index(name)
+        sortedNames.insert(nameIndex, item)
+        sortedNames.pop(nameIndex+1)
+    return sortedNames
+
+
+#Uses a builtin sqlalchemy command to return a list of only the items under the given category
+def sortInventoryByCategory(category):
+    inventoryList = Inventory.query.all()
+    categoryDictionary = {category: "on"}
+    result = Inventory.query.filter_by(**categoryDictionary).all()
+    return result
+
+
+#Put in how inventory should be sorted as a parameter later
 @app.route("/inventory", methods = ["POST", "GET"])
 def inventory():
     if request.method == "POST":
+        print(request.form)
+        print("Vegetarian" in request.form)
         item = request.form["Item"].title()
         amount = request.form["Amount"]
 
@@ -121,12 +144,12 @@ def inventory():
                 #commit changes to database and return the inventory template
                 database.session.commit()
 
-                return render_template("staff_inventory.html", values = sortInventory(), auth=verify_staff(), user="Alex")
+                return render_template("staff_inventory.html", values = sortInventoryByAmount(Inventory.query.all()), auth=verify_staff(), user="Alex")
         #Add info user entered into form to database
         newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
         database.session.add(newEntry)
         database.session.commit()
-    return render_template("staff_inventory.html", values = sortInventory(), auth=verify_staff(), user="Alex")
+    return render_template("staff_inventory.html", values = sortInventoryByAmount(Inventory.query.all()), auth=verify_staff(), user="Alex")
 
 if __name__ == "__main__":
     database.create_all()
