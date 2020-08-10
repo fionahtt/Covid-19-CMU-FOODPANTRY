@@ -56,29 +56,28 @@
         <input type = "submit" name = "Submit">
     </form><br><br>
 
-    <h4>Inventory</h4>
+    <div class="divider"></div>
 
     <div class = "section">
         <div class = "row">
             <div class = "col s3">
                 <h4>Inventory</h4>
             </div></br>
-            <!-- HEELLLLPPPP DUNNO HOW TO MAKE THIS WORK -->
-
-	    <!-- Dropdown Structure -->
-            <ul id="dropdown" class="dropdown-content">
-            	<li><a href="#!">Grain</a></li>
-            	<li><a href="#!">Produce</a></li>
-            	<li><a href="#!">Dairy</a></li>
-            	<li><a href="#!">Snacks</a></li>
-            	<li><a href="#!">Vegan</a></li>
-            	<li><a href="#!">Vegetarian</a></li>
-            </ul>
-            <!-- Dropdown Trigger -->
-
-            <a class="dropdown-button btn" href="#" data-activates="dropdown">Filter By:</a>
+            <div class = "col s3 offset-s6">
+                <!-- Dropdown Structure -->
+                <ul id="dropdown" class="dropdown-content">
+                    <li><a href="{{url_for('inventory', sortBy='amount')}}">All</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='grain')}}">Grain</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='produce')}}">Produce</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='dairy')}}">Dairy</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='snacks')}}">Snacks</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='vegan')}}">Vegan</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='vegetarian')}}">Vegetarian</a></li>
+                </ul>
+                <!-- Dropdown Trigger -->
+                <a class="dropdown-button btn" href="#" data-activates="dropdown">Filter By:</a>
+            </div>
         </div>
-
 
         <table class = "striped">
             <thead>
@@ -93,9 +92,13 @@
                         <td>{{item.name}}</td>
                         <!-- Add feature to add/subtract items from inventory here -->
                         <td>{{item.amount}}</td>
-                        <!-- Maybe use a javascript function triggered by onmousedown here? -->
-                        <td><a>Edit</a></td>
-                        <td><a>Remove</a></td>
+                        <td><a class="waves-effect waves-teal btn-flat">Edit</a></td>
+                        <td>
+                            <form action="#" method="post">
+                                <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="itemID" value={{item._id}}>Remove</button>
+                            </form>
+                        </td>
+                        
                     </tr>
                 {% endfor %}
             </tbody>
