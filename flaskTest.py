@@ -110,6 +110,11 @@ def sortInventoryByCategory(category):
 #   Values: 'amount', 'dairy', 'grain', 'snacks', etc.
 @app.route("/inventory/<sortBy>", methods = ["POST", "GET"])
 def inventory(sortBy='amount'):
+    #Need sortBy conditionals at top and bottom for now b/c there are some places where return render_template are called earlier
+    if sortBy == "amount":
+        inventoryList = sortInventoryByAmount(Inventory.query.all())
+    else:
+        inventoryList = sortInventoryByCategory(sortBy)
     if request.method == "POST":
         #If the form being submitted is the Add/Edit Items form at top of page:
         if "Item" in request.form:
@@ -139,30 +144,39 @@ def inventory(sortBy='amount'):
             #If item already exists or user didn't enter an amount:
             if foundItem or amount == "": 
                 Inventory.query.filter_by(name = item).delete()
-                #If user didn't enter an amount, delete entry
-                if amount == "": 
-                    #commit changes to database and return the inventory template
-                    database.session.commit()
-                    if sortBy == "amount":
-                        inventoryList = sortInventoryByAmount(Inventory.query.all())
-                    else:
-                        inventoryList = sortInventoryByCategory(sortBy)
-                    return render_template("staff_inventory.html", values = inventoryList, auth=verify_staff(), user="Alex")
+                #If user didn't enter an amount, automatically set item amount to 0
+                if amount == "":
+                    amount = "0" 
             #Add info user entered into form to database
             newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
             database.session.add(newEntry)
             database.session.commit()
         #If a 'Remove' button in the table is clicked:
-        else:
+        elif "removeItemID" in request.form:
             #Remove item from database and commit changes
-            removedID = request.form["itemID"]
+            removedID = request.form["removeItemID"]
             removedItem = Inventory.query.filter_by(_id = removedID).delete()
+            database.session.commit()
+        #If an "edit" button in the table is clicked:
+        elif "editItemID" in request.form:
+            #Record the item id of the specific item to edit, return the template w/ this id as attribute for use in template
+            editID = int(request.form["editItemID"])
+            return render_template("staff_inventory.html", values = inventoryList, editItemID = editID, auth=verify_staff(), user="Alex")
+        #If changes within the table are saved:
+        elif "editedItemID" in request.form:
+            #Assign vars to newly inputted values, assign to that item in the database and save
+            editedID = request.form["editedItemID"]
+            newName = request.form["newName"].title()
+            newAmount = request.form["newAmount"]
+            item = Inventory.query.filter_by(_id = editedID).first()
+            item.name = newName
+            item.amount = newAmount
             database.session.commit()
     if sortBy == "amount":
         inventoryList = sortInventoryByAmount(Inventory.query.all())
     else:
         inventoryList = sortInventoryByCategory(sortBy)
-    return render_template("staff_inventory.html", values = inventoryList, auth=verify_staff(), user="Alex")
+    return render_template("staff_inventory.html", values = inventoryList, editItemID = "None", auth=verify_staff(), user="Alex")
 
 if __name__ == "__main__":
     database.create_all()

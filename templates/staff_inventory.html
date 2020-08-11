@@ -13,7 +13,7 @@
         <label>Item:</label>
         <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
         <label>Amount:</label>
-        <input type = "number" name = "Amount" min = "1" max = 100><br><br>
+        <input type = "number" name = "Amount" min = "0"><br><br>
 
         <label>Category (check all that apply)</label>
         <p>
@@ -88,19 +88,40 @@
             </thead>
             <tbody>
                 {% for item in values %}
-                    <tr>
-                        <td>{{item.name}}</td>
-                        <!-- Add feature to add/subtract items from inventory here -->
-                        <td>{{item.amount}}</td>
-                        <td><a class="waves-effect waves-teal btn-flat">Edit</a></td>
-                        <td>
+                    <!-- Check if someone has clicked the edit button before, 
+                         make a specific row editable by passing in item id and checking each one for a match -->
+                    {% if item._id == editItemID %}
+                        <tr>
                             <form action="#" method="post">
-                                <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="itemID" value={{item._id}}>Remove</button>
+                                <td>
+                                    <input type="text" name="newName" placeholder={{item.name}} required>
+                                </td>
+                                <td>
+                                    <input type="number" name="newAmount" placeholder={{item.amount}} min="0" required>
+                                </td>
+                                <td>
+                                    <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item._id}}>Save</button>
+                                </td>
                             </form>
-                        </td>
-                        
-                    </tr>
-                {% endfor %}
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>{{item.name}}</td>
+                            <!-- Add feature to add/subtract items from inventory here -->
+                            <td>{{item.amount}}</td>
+                            <td>
+                                <form action="#" method="post">
+                                    <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item._id}}>Edit</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="#" method="post">
+                                    <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item._id}}>Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}  
             </tbody>
         </table>
     </div>
