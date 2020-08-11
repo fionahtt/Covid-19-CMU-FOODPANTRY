@@ -8,53 +8,63 @@
 {% endblock %}
 
 {% block content %}
-    <h4>Add/Edit Items</h4><br>
-    <form action = "#" method = "post">
-        <label>Item:</label>
-        <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
-        <label>Amount:</label>
-        <input type = "number" name = "Amount" min = "0"><br><br>
-
-        <label>Category (check all that apply)</label>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Grain"/>
-              <span>Grain</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Produce"/>
-              <span>Produce</span>
-            </label>
-        </p>
-        <p>
-            <label>
-                <input type = "checkbox" class = "filled-in" name = "Dairy"/>
-                <span>Dairy</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Snacks"/>
-              <span>Snacks</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Vegan"/>
-              <span>Vegan</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Vegetarian"/>
-              <span>Vegetarian</span>
-            </label>
-        </p>
-        
-        <input type = "submit" name = "Submit">
-    </form><br><br>
+    <div class="section">
+        <ul class="collapsible">
+            <li>
+                <div class="collapsible-header"><h5>Add/Edit Items</h5></div>
+                <div class="collapsible-body"><span>
+                    <form action = "#" method = "post">
+                        <label>Item:</label>
+                        <input type = "text" name = "Item" size = "25" placeholder = "Item Name" required><br><br>
+                        <label>Amount:</label>
+                        <input type = "number" name = "Amount" min = "0"><br><br>
+                
+                        <label>Category (check all that apply)</label>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Grain"/>
+                            <span>Grain</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Produce"/>
+                            <span>Produce</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                                <input type = "checkbox" class = "filled-in" name = "Dairy"/>
+                                <span>Dairy</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Snacks"/>
+                            <span>Snacks</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Vegan"/>
+                            <span>Vegan</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Vegetarian"/>
+                            <span>Vegetarian</span>
+                            </label>
+                        </p><br>
+                        <button class="btn waves-effect waves-light" type="submit" name="Submit">Submit
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </form>
+                </span></div>
+            </li>
+        </ul>
+    </div>
+    
 
     <div class="divider"></div>
 
