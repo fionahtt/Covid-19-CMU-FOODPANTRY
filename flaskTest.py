@@ -117,54 +117,81 @@ def sortInventoryByCategory(category):
     inventoryList = Inventory.query.all()
     categoryDictionary = {category: "on"}
     result = Inventory.query.filter_by(**categoryDictionary).all()
+    result = sortInventoryByAmount(result)
     return result
 
 
-#Sort by alphabetical name or small>large amount??
-@app.route("/inventory", methods = ["POST", "GET"])
-def inventory():
+#Parameter sortBy is a string representing how the inventory table should be sorted
+#   Values: 'amount', 'dairy', 'grain', 'snacks', etc.
+@app.route("/inventory/<sortBy>", methods = ["POST", "GET"])
+def inventory(sortBy='amount'):
+    #Need sortBy conditionals at top and bottom for now b/c there are some places where return render_template are called earlier
+    if sortBy == "amount":
+        inventoryList = sortInventoryByAmount(Inventory.query.all())
+    else:
+        inventoryList = sortInventoryByCategory(sortBy)
     if request.method == "POST":
-        #print(request.form)
-        #print("Vegetarian" in request.form)
-        item = request.form["Item"].title()
-        amount = request.form["Amount"]
-
-        grain = ""
-        produce = ""
-        dairy = ""
-        snacks = ""
-        vegan = ""
-        vegetarian = ""
-
-        if "Grain" in request.form:
-            grain = "on"
-        if "Produce" in request.form:
-            produce = "on"
-        if "Dairy" in request.form:
-            dairy = "on"
-        if "Snacks" in request.form:
-            snacks = "on"
-        if "Vegan" in request.form:
-            vegan = "on"
-        if "Vegetarian" in request.form:
-            vegetarian = "on"
-
-        #Check to see if item already exists in database
-        foundItem = Inventory.query.filter_by(name = item).first()
-        #If item already exists or user didn't enter an amount:
-        if foundItem or amount == "": 
-            Inventory.query.filter_by(name = item).delete()
-            #If user didn't enter an amount, delete entry
-            if amount == "": 
-                #commit changes to database and return the inventory template
-                database.session.commit()
-
-                return render_template("staff_inventory.html", values = sortInventoryByAmount(Inventory.query.all()), auth=verify_staff(), user="Alex")
-        #Add info user entered into form to database
-        newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
-        database.session.add(newEntry)
-        database.session.commit()
-    return render_template("staff_inventory.html", values = sortInventoryByAmount(Inventory.query.all()), auth=verify_staff(), user="Alex")
+        #If the form being submitted is the Add/Edit Items form at top of page:
+        if "Item" in request.form:
+            item = request.form["Item"].title()
+            amount = request.form["Amount"]
+            grain = ""
+            produce = ""
+            dairy = ""
+            snacks = ""
+            vegan = ""
+            vegetarian = ""
+            #Check form data to see if any categories have been checked, set values to 'on' if so
+            if "Grain" in request.form:
+                grain = "on"
+            if "Produce" in request.form:
+                produce = "on"
+            if "Dairy" in request.form:
+                dairy = "on"
+            if "Snacks" in request.form:
+                snacks = "on"
+            if "Vegan" in request.form:
+                vegan = "on"
+            if "Vegetarian" in request.form:
+                vegetarian = "on"
+            #Check to see if item already exists in database
+            foundItem = Inventory.query.filter_by(name = item).first()
+            #If item already exists or user didn't enter an amount:
+            if foundItem or amount == "": 
+                Inventory.query.filter_by(name = item).delete()
+                #If user didn't enter an amount, automatically set item amount to 0
+                if amount == "":
+                    amount = "0" 
+            #Add info user entered into form to database
+            newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
+            database.session.add(newEntry)
+            database.session.commit()
+        #If a 'Remove' button in the table is clicked:
+        elif "removeItemID" in request.form:
+            #Remove item from database and commit changes
+            removedID = request.form["removeItemID"]
+            removedItem = Inventory.query.filter_by(_id = removedID).delete()
+            database.session.commit()
+        #If an "edit" button in the table is clicked:
+        elif "editItemID" in request.form:
+            #Record the item id of the specific item to edit, return the template w/ this id as attribute for use in template
+            editID = int(request.form["editItemID"])
+            return render_template("staff_inventory.html", values = inventoryList, editItemID = editID, auth=verify_staff(), user="Alex")
+        #If changes within the table are saved:
+        elif "editedItemID" in request.form:
+            #Assign vars to newly inputted values, assign to that item in the database and save
+            editedID = request.form["editedItemID"]
+            newName = request.form["newName"].title()
+            newAmount = request.form["newAmount"]
+            item = Inventory.query.filter_by(_id = editedID).first()
+            item.name = newName
+            item.amount = newAmount
+            database.session.commit()
+    if sortBy == "amount":
+        inventoryList = sortInventoryByAmount(Inventory.query.all())
+    else:
+        inventoryList = sortInventoryByCategory(sortBy)
+    return render_template("staff_inventory.html", values = inventoryList, editItemID = "None", auth=verify_staff(), user="Alex")
 
 if __name__ == "__main__":
     database.create_all()
