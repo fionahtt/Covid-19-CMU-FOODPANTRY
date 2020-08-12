@@ -41,9 +41,10 @@
             <div class="nav-wrapper">
                 <ul id="nav-mobile" class="left hide-on-med-and-down">
                     {% if auth %}
-                        <!--{% block nav %}{% endblock %}-->
                         <!-- Small bug here: Home is always shown as the selected page in navbar, no matter what page you're on -->
-                        {% include "staff_nav.html" %}
+                        {% block nav_content %}
+			{% include "staff_nav.html" %}
+			{% endblock %}
                     {% else %}
                         {% include "nav.html" %}
                     {% endif %}

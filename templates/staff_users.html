@@ -2,9 +2,11 @@
   
 {% block title %}Users{% endblock %}
 
-{% block nav %}
+{% block nav_content %}
 <li><a href="/">Home</a></li>
-<li class = "active"><a href="inventory">Inventory</a></li>
+<li><a href="{{url_for('inventory', sortBy='amount')}}">Inventory</a></li>
+<li class = "active"><a href="{{url_for('users')}}">Users</a></li>
+<li><a href="orders">Orders</a></li>
 {% endblock %}
 
 {% block content %}
