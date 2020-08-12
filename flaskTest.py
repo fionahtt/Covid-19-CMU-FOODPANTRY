@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.secret_key = "hello"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inventory.sqlite3"
+app.config["SQLALCHEMY_BINDS"] = {"users": "sqlite:///users.sqlite3"}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 database = SQLAlchemy(app)
@@ -31,6 +32,16 @@ class Inventory(database.Model):
         self.snacks = snacks
         self.vegan = vegan
         self.vegetarian = vegetarian
+
+class Users(database.Model):
+    __bind_key__ = "users"
+    _id = database.Column("id", database.Integer, primary_key = True)
+    name = database.Column(database.String(100))
+    email = database.Column(database.String(100))
+
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
 
 #Haven't made yet
 @app.route("/")
@@ -60,6 +71,10 @@ def staff_index():
 @app.route("/register")
 def register():
     pass
+
+@app.route("/users")
+def users():
+    return render_template("staff_users.html", values = Users.query.all(), auth=verify_staff(), user="Alex")
 
 
 #Helper function: Goes thru inventory database and returns a list where items are
@@ -180,4 +195,5 @@ def inventory(sortBy='amount'):
 
 if __name__ == "__main__":
     database.create_all()
+    database.create_all(bind = '__all__')
     app.run()
