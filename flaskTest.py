@@ -13,6 +13,7 @@ class Inventory(database.Model):
     _id = database.Column("id", database.Integer, primary_key = True)
     name = database.Column(database.String(100))
     amount = database.Column(database.Integer)
+    note = database.Column(database.Text)
 
     #Food categories, "on" if applicable, "" if not
     grain = database.Column(database.String(2))
@@ -22,16 +23,17 @@ class Inventory(database.Model):
     vegan = database.Column(database.String(2))
     vegetarian = database.Column(database.String(2))
 
-    #maybe add image later on somehow?
-    def __init__(self, name, amount, grain, produce, dairy, snacks, vegan, vegetarian):
+    def __init__(self, name, amount, note, grain, produce, dairy, snacks, vegan, vegetarian):
         self.name = name
         self.amount = amount
+        self.note = note
         self.grain = grain
         self.produce = produce
         self.dairy = dairy
         self.snacks = snacks
         self.vegan = vegan
         self.vegetarian = vegetarian
+        self.note
 
 class Users(database.Model):
     __bind_key__ = "users"
@@ -113,9 +115,11 @@ def sortInventoryByAlphabetical(inventoryList):
 
 
 #Uses a builtin sqlalchemy command to return a list of only the items under the given category
-def sortInventoryByCategory(category):
+def sortInventoryByCategory(categoryList):
     inventoryList = Inventory.query.all()
-    categoryDictionary = {category: "on"}
+    categoryDictionary = {}
+    for cat in categoryList:
+        categoryDictionary[cat] = "on"
     result = Inventory.query.filter_by(**categoryDictionary).all()
     result = sortInventoryByAmount(result)
     return result
@@ -123,18 +127,15 @@ def sortInventoryByCategory(category):
 
 #Parameter sortBy is a string representing how the inventory table should be sorted
 #   Values: 'amount', 'dairy', 'grain', 'snacks', etc.
-@app.route("/inventory/<sortBy>", methods = ["POST", "GET"])
-def inventory(sortBy='amount'):
-    #Need sortBy conditionals at top and bottom for now b/c there are some places where return render_template are called earlier
-    if sortBy == "amount":
-        inventoryList = sortInventoryByAmount(Inventory.query.all())
-    else:
-        inventoryList = sortInventoryByCategory(sortBy)
+@app.route("/inventory", methods = ["POST", "GET"])
+def inventory():
+    inventoryList = sortInventoryByAmount(Inventory.query.all())
     if request.method == "POST":
         #If the form being submitted is the Add/Edit Items form at top of page:
         if "Item" in request.form:
             item = request.form["Item"].title()
             amount = request.form["Amount"]
+            note = request.form["Note"]
             grain = ""
             produce = ""
             dairy = ""
@@ -163,9 +164,18 @@ def inventory(sortBy='amount'):
                 if amount == "":
                     amount = "0" 
             #Add info user entered into form to database
-            newEntry = Inventory(item, amount, grain, produce, dairy, snacks, vegan, vegetarian)
+            newEntry = Inventory(item, amount, note, grain, produce, dairy, snacks, vegan, vegetarian)
             database.session.add(newEntry)
             database.session.commit()
+        #If user submits a form to filter inventory by categories
+        elif "filterBy" in request.form:
+            catList = []
+            for cat in request.form:
+                #filterBy is the submit button's name, so it's not a category
+                if cat != "filterBy":
+                    catList.append(cat)
+            inventoryList = sortInventoryByCategory(catList)
+            return render_template("staff_inventory.html", values = inventoryList, editItemID = "None", auth=verify_staff(), user="Alex")
         #If a 'Remove' button in the table is clicked:
         elif "removeItemID" in request.form:
             #Remove item from database and commit changes
@@ -187,10 +197,7 @@ def inventory(sortBy='amount'):
             item.name = newName
             item.amount = newAmount
             database.session.commit()
-    if sortBy == "amount":
-        inventoryList = sortInventoryByAmount(Inventory.query.all())
-    else:
-        inventoryList = sortInventoryByCategory(sortBy)
+    inventoryList = sortInventoryByAmount(Inventory.query.all())
     return render_template("staff_inventory.html", values = inventoryList, editItemID = "None", auth=verify_staff(), user="Alex")
 
 if __name__ == "__main__":
