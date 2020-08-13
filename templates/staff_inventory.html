@@ -159,21 +159,20 @@
                                     <td>{{item.name}}</td>
                                     <td>{{item.amount}}</td>
                                     <td>
-                                        <!-- TRYING TO PUT MODAL HERE TO DISPLAY NOTES, NOT WORKING YET -->
-                                        <!-- Modal Trigger -->
-                                        <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Note</a>
-
-                                        <!-- Modal Structure -->
-                                        <div id="modal1" class="modal">
-                                            <div class="modal-content">
-                                                <h4>Notes:</h4>
-                                                <p>A bunch of text A bunch of text A bunch of text A bunch of text A bunch of text</p>
+                                        {% if item.note != "" %}
+                                            <!-- Modal Trigger -->
+                                            <a class="waves-effect waves-light btn modal-trigger" href="#{{item._id}}">Note</a>
+                                            <!-- Modal Structure -->
+                                            <div id="{{item._id}}" class="modal">
+                                                <div class="modal-content">
+                                                    <h4>Note:</h4>
+                                                    <p>{{item.note}}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="#!" class="modal-close btn-flat">Close</a>
+                                                </div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <a href="#!" class="modal-close btn-flat">Agree</a>
-                                            </div>
-                                        </div>
-
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <form action="#" method="post">
@@ -190,7 +189,22 @@
                                 <tr>
                                     <td>{{item.name}}</td>
                                     <td>{{item.amount}}</td>
-                                    <td></td>
+                                    <td>
+                                        {% if item.note != "" %}
+                                            <!-- Modal Trigger -->
+                                            <a class="waves-effect waves-light btn modal-trigger" href="#{{item._id}}">Note</a>
+                                            <!-- Modal Structure -->
+                                            <div id="{{item._id}}" class="modal">
+                                                <div class="modal-content">
+                                                    <h4>Note:</h4>
+                                                    <p>{{item.note}}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="#!" class="modal-close btn-flat">Close</a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <form action="#" method="post">
                                             <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item._id}}>Edit</button>
