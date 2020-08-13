@@ -4,35 +4,36 @@
 
 {% block nav_content %}
 <li><a href="/">Home</a></li>
-<li><a href="{{url_for('inventory', sortBy='amount')}}">Inventory</a></li>
+<li><a href="{{url_for('inventory')}}">Inventory</a></li>
 <li class = "active"><a href="{{url_for('users')}}">Users</a></li>
 <li><a href="orders">Orders</a></li>
 {% endblock %}
 
 {% block content %}
+    <div class="container">
+        <h4>Users</h4>
 
-    <h4>Users</h4>
+        <div class = "section">
 
-    <div class = "section">
-
-        <table class = "striped">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in values %}
+            <table class = "striped">
+                <thead>
                     <tr>
-                        <td>{{item.name}}</td>
-                        <td>{{item.email}}</td>
-                        <!-- <td><a>Edit</a></td> -->
-                        <!-- <td><a>Remove</a></td> -->
+                        <th>User</th>
+                        <th>Email</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for item in values %}
+                        <tr>
+                            <td>{{item.name}}</td>
+                            <td>{{item.email}}</td>
+                            <!-- <td><a>Edit</a></td> -->
+                            <!-- <td><a>Remove</a></td> -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 {% endblock %}
