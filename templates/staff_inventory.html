@@ -2,83 +2,96 @@
 
 {% block title %}Inventory{% endblock %}
 
-{% block nav %}
+{% block nav_content %}
 <li><a href="/">Home</a></li>
-<li class = "active"><a href="inventory">Inventory</a></li>
+<li class = "active"><a href="{{url_for('inventory', sortBy='amount')}}">Inventory</a></li>
+<li><a href="{{url_for('users')}}">Users</a></li>
+<li><a href="orders">Orders</a></li>
 {% endblock %}
 
 {% block content %}
-    <h4>Add/Edit Items</h4><br>
-    <form action = "#" method = "post">
-        <label>Item:</label>
-        <input type = "text" name = "Item" size = "25" placeholder = "Item Name"><br><br>
-        <label>Amount:</label>
-        <input type = "number" name = "Amount" min = "1" max = 100><br><br>
+    <div class="section">
+        <ul class="collapsible">
+            <li>
+                <div class="collapsible-header"><h5>Add/Edit Items</h5></div>
+                <div class="collapsible-body"><span>
+                    <form action = "#" method = "post">
+                        <label>Item:</label>
+                        <input type = "text" name = "Item" size = "25" placeholder = "Item Name" required><br><br>
+                        <label>Amount:</label>
+                        <input type = "number" name = "Amount" min = "0"><br><br>
+                
+                        <label>Category (check all that apply)</label>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Grain"/>
+                            <span>Grain</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Produce"/>
+                            <span>Produce</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                                <input type = "checkbox" class = "filled-in" name = "Dairy"/>
+                                <span>Dairy</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Snacks"/>
+                            <span>Snacks</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Vegan"/>
+                            <span>Vegan</span>
+                            </label>
+                        </p>
+                        <p>
+                            <label>
+                            <input type="checkbox" class="filled-in" name = "Vegetarian"/>
+                            <span>Vegetarian</span>
+                            </label>
+                        </p><br>
+                        <button class="btn waves-effect waves-light" type="submit" name="Submit">Submit
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </form>
+                </span></div>
+            </li>
+        </ul>
+    </div>
+    
 
-        <label>Category (check all that apply)</label>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Grain"/>
-              <span>Grain</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Produce"/>
-              <span>Produce</span>
-            </label>
-        </p>
-        <p>
-            <label>
-                <input type = "checkbox" class = "filled-in" name = "Dairy"/>
-                <span>Dairy</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Snacks"/>
-              <span>Snacks</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Vegan"/>
-              <span>Vegan</span>
-            </label>
-        </p>
-        <p>
-            <label>
-              <input type="checkbox" class="filled-in" name = "Vegetarian"/>
-              <span>Vegetarian</span>
-            </label>
-        </p>
-        
-        <input type = "submit" name = "Submit">
-    </form><br><br>
-
-    <h4>Inventory</h4>
+    <div class="divider"></div>
 
     <div class = "section">
         <div class = "row">
             <div class = "col s3">
                 <h4>Inventory</h4>
             </div></br>
-            <!-- HEELLLLPPPP DUNNO HOW TO MAKE THIS WORK -->
 
-	    <!-- Dropdown Structure -->
-            <ul id="dropdown" class="dropdown-content">
-            	<li><a href="#!">Grain</a></li>
-            	<li><a href="#!">Produce</a></li>
-            	<li><a href="#!">Dairy</a></li>
-            	<li><a href="#!">Snacks</a></li>
-            	<li><a href="#!">Vegan</a></li>
-            	<li><a href="#!">Vegetarian</a></li>
-            </ul>
-            <!-- Dropdown Trigger -->
+            <div class = "col s3 offset-s6">
+                <!-- Dropdown Structure -->
+                <ul id="dropdown" class="dropdown-content">
+                    <li><a href="{{url_for('inventory', sortBy='amount')}}">All</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='grain')}}">Grain</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='produce')}}">Produce</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='dairy')}}">Dairy</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='snacks')}}">Snacks</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='vegan')}}">Vegan</a></li>
+                    <li><a href="{{url_for('inventory', sortBy='vegetarian')}}">Vegetarian</a></li>
+                </ul>
+                <!-- Dropdown Trigger -->
+                <a class="dropdown-button btn" href="#" data-activates="dropdown">Filter By:</a>
+            </div>
 
-            <a class="dropdown-button btn" href="#" data-activates="dropdown">Filter By:</a>
         </div>
-
 
         <table class = "striped">
             <thead>
@@ -89,15 +102,39 @@
             </thead>
             <tbody>
                 {% for item in values %}
-                    <tr>
-                        <td>{{item.name}}</td>
-                        <!-- Add feature to add/subtract items from inventory here -->
-                        <td>{{item.amount}}</td>
-                        <!-- Maybe use a javascript function triggered by onmousedown here? -->
-                        <td><a>Edit</a></td>
-                        <td><a>Remove</a></td>
-                    </tr>
-                {% endfor %}
+                    <!-- Check if someone has clicked the edit button before, 
+                         make a specific row editable by passing in item id and checking each one for a match -->
+                    {% if item._id == editItemID %}
+                        <tr>
+                            <form action="#" method="post">
+                                <td>
+                                    <input type="text" name="newName" placeholder={{item.name}} required>
+                                </td>
+                                <td>
+                                    <input type="number" name="newAmount" placeholder={{item.amount}} min="0" required>
+                                </td>
+                                <td>
+                                    <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item._id}}>Save</button>
+                                </td>
+                            </form>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>{{item.name}}</td>
+                            <td>{{item.amount}}</td>
+                            <td>
+                                <form action="#" method="post">
+                                    <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item._id}}>Edit</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="#" method="post">
+                                    <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item._id}}>Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}  
             </tbody>
         </table>
     </div>
