@@ -287,10 +287,7 @@ def inventory():
             item.amount = newAmount
             database.session.commit()
 
-    if sortBy == "amount":
-        inventoryList = sortInventoryByAmount(Inventory.query.all())
-    else:
-        inventoryList = sortInventoryByCategory(sortBy)
+    inventoryList = sortInventoryByAmount(Inventory.query.all())
     return goto_page_inventory(values = sortInventoryByAmount(Inventory.query.all()), editItemID = "None")
 
 
