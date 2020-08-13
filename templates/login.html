@@ -5,8 +5,7 @@
 
 
 {% block content %}
-    <div class="g-signin2" data-onsuccess="onSignIn"></div>
-    <p> hi there </p>
+<!--<div class="g-signin2" data-onsuccess="onSignIn"></div>
 	<script>
       function onSignIn(googleUser) {
         // Useful data for your client-side scripts:
@@ -22,5 +21,13 @@
         var id_token = googleUser.getAuthResponse().id_token;
         console.log("ID Token: " + id_token);
       }
-    </script>
+    </script>--!>
+    <form action="#" method="POST">
+        <h6>Email</h6>
+        <p><input type="email" name="email" placeholder="Enter email" /> </p>
+        <h6>Password</h6>
+        <p><input type="password" name="password" placeholder="Enter password" /></p>
+        <p><input type="submit" name="submit" /> </p>
+    </form>
+
 {% endblock %}
