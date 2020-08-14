@@ -1,11 +1,11 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_oauth import OAuth
+#from flask_oauth import OAuth
 from datetime import timedelta
-from werkzeug.security import generate_password_hash
+#from werkzeug.security import generate_password_hash
 #from flask_login import LoginManager, UserMixin
 #from authlib.integrations.flask_client import OAuth
-
+import create_user
 
 #GOOGLE_CLIENT_ID='434804791134-5kl3ab8ml5k62tftvrv0cqos2jh2evs9.apps.googleusercontent.com'
 #GOOGLE_CLIENT_SECRET='gPM0ax_AUvJG2Nrgf6Go9II-'
@@ -15,7 +15,6 @@ SECRET_KEY='hello'
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///default.sqlite3"
-#app.config["SQLALCHEMY_BINDS"] = {"users": "sqlite:///users.sqlite3"}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.permanent_session_lifetime = timedelta(minutes=60)
 
@@ -39,6 +38,7 @@ database = SQLAlchemy(app)
 
 
 class Users(database.Model):
+    __tablename__ = 'users'
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(100))
     email = database.Column(database.String(100))
@@ -51,6 +51,7 @@ class Users(database.Model):
 
 
 class Inventory(database.Model):
+    __tablename__ = 'inventory'
     _id = database.Column("id", database.Integer, primary_key = True)
     name = database.Column(database.String(100))
     amount = database.Column(database.Integer)
@@ -120,8 +121,12 @@ def login():
 
         found_user = Users.query.filter_by(email=form['email']).first()
         if found_user:
-            session["email"] = found_user.email
-            session["name"] = found_user.name
+            pw = found_user.password
+            if form.get('password') == pw:
+                session["email"] = found_user.email
+                session["name"] = found_user.name
+            else:
+                return redirect(url_for("login"))
         else:
             return redirect(url_for("login"))
 
@@ -298,5 +303,4 @@ def inventory():
 
 if __name__ == "__main__":
     database.create_all()
-    database.create_all(bind = '__all__')
     app.run()
