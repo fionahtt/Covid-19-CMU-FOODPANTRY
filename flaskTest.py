@@ -14,8 +14,8 @@ SECRET_KEY='hello'
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inventory.sqlite3"
-app.config["SQLALCHEMY_BINDS"] = {"users": "sqlite:///users.sqlite3"}
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///default.sqlite3"
+#app.config["SQLALCHEMY_BINDS"] = {"users": "sqlite:///users.sqlite3"}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.permanent_session_lifetime = timedelta(minutes=60)
 
@@ -95,6 +95,11 @@ def goto_page_inventory(values, editItemID):
     sd = get_session_display()
     return render_template("staff_inventory.html", values=values, editItemID=editItemID, auth=sd[0], user=sd[1])
 
+def goto_page_users(values):
+    sd = get_session_display()
+    return render_template("staff_users.html", values=values, auth=sd[0], user=sd[1])
+
+
 
 
 def verify_staff():
@@ -165,7 +170,7 @@ def register():
 
 @app.route("/users")
 def users():
-    return render_template("staff_users.html", values = Users.query.all(), auth=verify_staff(), user="Alex")
+    return goto_page_users(values = Users.query.all())
 
 
 #Helper function: Goes thru inventory database and returns a list where items are
