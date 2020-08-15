@@ -1,79 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
-#from flask_oauth import OAuth
 from datetime import timedelta
-#from werkzeug.security import generate_password_hash
-#from flask_login import LoginManager, UserMixin
-#from authlib.integrations.flask_client import OAuth
-
-#GOOGLE_CLIENT_ID='434804791134-5kl3ab8ml5k62tftvrv0cqos2jh2evs9.apps.googleusercontent.com'
-#GOOGLE_CLIENT_SECRET='gPM0ax_AUvJG2Nrgf6Go9II-'
-SECRET_KEY='hello'
-#REDIRECT_URI = '/oauth2callback'
-
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///default.sqlite3"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.permanent_session_lifetime = timedelta(minutes=60)
-
-database = SQLAlchemy(app)
-#oauth = OAuth()
-
-#google = oauth.remote_app(
-#    'google',
-#    base_url='https://www.google.com/accounts/',
-#    authorize_url='https://accounts.google.com/o/oauth2/auth',
-#    request_token_url=None,
-#    request_token_params={'scope': 'https://www.googleapis.com/auth/userinfo.email',
-#    'response_type': 'code'},
-#    access_token_url='https://accounts.google.com/o/oauth2/token',
-#    access_token_method='POST',
-#    access_token_params={'grant_type': 'authorization_code'},
-#    consumer_key=GOOGLE_CLIENT_ID,
-#    consumer_secret=GOOGLE_CLIENT_SECRET
-#)
-
-
-
-class Users(database.Model):
-    __tablename__ = 'users'
-    id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(100))
-    email = database.Column(database.String(100))
-    password = database.Column(database.String(100))
-
-    def __init__(self, name='', email='', password=''):
-        self.name = name
-        self.email = email
-        self.password = password
-
-
-class Inventory(database.Model):
-    __tablename__ = 'inventory'
-    _id = database.Column("id", database.Integer, primary_key = True)
-    name = database.Column(database.String(100))
-    amount = database.Column(database.Integer)
-    note = database.Column(database.Text)
-
-    #Food categories, "on" if applicable, "" if not
-    grain = database.Column(database.String(2))
-    produce = database.Column(database.String(2))
-    dairy = database.Column(database.String(2))
-    snacks = database.Column(database.String(2))
-    vegan = database.Column(database.String(2))
-    vegetarian = database.Column(database.String(2))
-
-    def __init__(self, name, amount, note, grain, produce, dairy, snacks, vegan, vegetarian):
-        self.name = name
-        self.amount = amount
-        self.note = note
-        self.grain = grain
-        self.produce = produce
-        self.dairy = dairy
-        self.snacks = snacks
-        self.vegan = vegan
-        self.vegetarian = vegetarian
+from models import database, User, Inventory
 
 #@google.tokengetter
 #def get_access_token():
@@ -102,7 +30,7 @@ def goto_page_users(values):
 
 
 def verify_staff():
-    pass 
+    pass
 
 
 @app.route("/")
@@ -154,7 +82,6 @@ def login():
 #    flash('You were signed in as %s' % resp['screen_name'])
 #    return redirect(next_url)
 
-
 @app.route("/logout")
 def logout():
     session.pop("name", None)
@@ -195,7 +122,6 @@ def sortInventoryByAmount(inventoryList):
         #Remove the amount in the list
         sortedAmounts.pop(amountIndex+1)
     return sortedAmounts
-
 
 #Might just make sortInventoryByAmount and sortInventoryByAlphabetical one function later
 def sortInventoryByAlphabetical(inventoryList):
@@ -255,11 +181,11 @@ def inventory():
             #Check to see if item already exists in database
             foundItem = Inventory.query.filter_by(name = item).first()
             #If item already exists or user didn't enter an amount:
-            if foundItem or amount == "": 
+            if foundItem or amount == "":
                 Inventory.query.filter_by(name = item).delete()
                 #If user didn't enter an amount, automatically set item amount to 0
                 if amount == "":
-                    amount = "0" 
+                    amount = "0"
             #Add info user entered into form to database
             newEntry = Inventory(item, amount, note, grain, produce, dairy, snacks, vegan, vegetarian)
             database.session.add(newEntry)
@@ -298,18 +224,3 @@ def inventory():
     inventoryList = sortInventoryByAmount(Inventory.query.all())
     return goto_page_inventory(values = sortInventoryByAmount(Inventory.query.all()), editItemID = "None")
 
-
-if __name__ == "__main__":
-    database.create_all()
-    alex = Users("Alex", "alexli2468@gmail.com", "zsdc")
-    fiona = Users("Fiona", "fionahtt@gmail.com", "12345")
-    sara = Users("Sara", "sarasong4@gmail.com", "website")
-
-    admin = [alex, fiona, sara]
-    for acc in admin:
-        exists = Users.query.filter(Users.email == acc.email).first()
-        if not exists:
-            database.session.add(acc)
-            database.session.commit()
-
-    app.run()
