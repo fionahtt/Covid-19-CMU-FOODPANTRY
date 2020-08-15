@@ -75,7 +75,6 @@ class Inventory(database.Model):
         self.snacks = snacks
         self.vegan = vegan
         self.vegetarian = vegetarian
-        self.note
 
 #@google.tokengetter
 #def get_access_token():
