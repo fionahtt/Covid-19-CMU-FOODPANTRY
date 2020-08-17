@@ -49,31 +49,33 @@ class Users(database.Model):
         self.password = password
 
 
-class Inventory(database.Model):
-    __tablename__ = 'inventory'
-    _id = database.Column("id", database.Integer, primary_key = True)
+#The following 3 tables make it so that staff can add their own categories using a many-to-many relationship
+itemCategories = database.Table("itemCategories",
+    database.Column("itemID", database.Integer, database.ForeignKey('items.id')),
+    database.Column("categoryID", database.Integer, database.ForeignKey('categories.id'))
+)
+
+
+class Categories(database.Model):
+    id = database.Column("id", database.Integer, primary_key = True)
+    name = database.Column(database.String(100))
+
+    def __init__(self, name):
+        self.name = name
+
+
+class Items(database.Model):
+    id = database.Column("id", database.Integer, primary_key = True)
     name = database.Column(database.String(100))
     amount = database.Column(database.Integer)
     note = database.Column(database.Text)
+    categories = database.relationship("Categories", secondary=itemCategories, backref=database.backref("items", lazy="dynamic"))
 
-    #Food categories, "on" if applicable, "" if not
-    grain = database.Column(database.String(2))
-    produce = database.Column(database.String(2))
-    dairy = database.Column(database.String(2))
-    snacks = database.Column(database.String(2))
-    vegan = database.Column(database.String(2))
-    vegetarian = database.Column(database.String(2))
-
-    def __init__(self, name, amount, note, grain, produce, dairy, snacks, vegan, vegetarian):
+    def __init__(self, name, amount, note):
         self.name = name
         self.amount = amount
         self.note = note
-        self.grain = grain
-        self.produce = produce
-        self.dairy = dairy
-        self.snacks = snacks
-        self.vegan = vegan
-        self.vegetarian = vegetarian
+
 
 #@google.tokengetter
 #def get_access_token():
@@ -90,15 +92,13 @@ def goto_page(s):
     return render_template(s, auth=sd[0], user=sd[1])
 
 # TODO TODO temporary bandaid, will change later
-def goto_page_inventory(values, editItemID):
+def goto_page_inventory(catList, values, editItemID):
     sd = get_session_display()
-    return render_template("staff_inventory.html", values=values, editItemID=editItemID, auth=sd[0], user=sd[1])
+    return render_template("staff_inventory.html", catList=catList, values=values, editItemID=editItemID, auth=sd[0], user=sd[1])
 
 def goto_page_users(values):
     sd = get_session_display()
     return render_template("staff_users.html", values=values, auth=sd[0], user=sd[1])
-
-
 
 
 def verify_staff():
@@ -176,93 +176,55 @@ def users():
     return goto_page_users(values = Users.query.all())
 
 
-#Helper function: Goes thru inventory database and returns a list where items are
-# sorted by amount, least to most
-#Called in inventory page whenever inventory.html is rendered
-def sortInventoryByAmount(inventoryList):
-    #Create a list just for the amounts of all items in database
-    sortedAmounts = []
-    for item in inventoryList:
-        sortedAmounts.append(item.amount)
-    sortedAmounts = sorted(sortedAmounts)
-    #Go thru database again and...
-    for item in inventoryList:
-        amount = item.amount
-        #Find where item is located in sorted list
-        amountIndex = sortedAmounts.index(amount)
-        #Add database item to that spot in the sorted list
-        sortedAmounts.insert(amountIndex, item)
-        #Remove the amount in the list
-        sortedAmounts.pop(amountIndex+1)
-    return sortedAmounts
 
 
-#Might just make sortInventoryByAmount and sortInventoryByAlphabetical one function later
-def sortInventoryByAlphabetical(inventoryList):
-    sortedNames = []
+#Given a list of category names (ex: ["Grain", "Vegetarian"]), return a list of all items in inventory
+#that fit under all categories in this list
+#   NOTE: Might wanna see if I could increase efficiency later
+def sortInventoryByCategory(catList):
+    #Use a query to:    1) Create a preliminary filter, return all items that fit under first category in catList
+    #                      This might reduce a bit of time compared to calling up ALL items in inventory
+    #                   2) Sort this list by increasing amount, no more need for another sortInventoryByAmount function
+    inventoryList = Items.query.join(Categories, Items.categories).filter(Categories.name==catList[0]).order_by(Items.amount)
+    result = []
     for item in inventoryList:
-        sortedNames.append(item.name)
-    sortedNames = sorted(sortedNames)
-    for item in inventoryList:
-        name = item.name
-        nameIndex = sortedNames.index(name)
-        sortedNames.insert(nameIndex, item)
-        sortedNames.pop(nameIndex+1)
-    return sortedNames
-
-
-#Uses a builtin sqlalchemy command to return a list of only the items under the given category
-def sortInventoryByCategory(categoryList):
-    inventoryList = Inventory.query.all()
-    categoryDictionary = {}
-    for cat in categoryList:
-        categoryDictionary[cat] = "on"
-    result = Inventory.query.filter_by(**categoryDictionary).all()
-    result = sortInventoryByAmount(result)
+        #Create a list of categories each item has that matches categories in catList
+        itemCats = []
+        for cat in item.categories:
+            if cat.name in catList:
+                itemCats.append(cat.name)
+        #If the length of catList and itemCats is the same, that means this item fits all filters!
+        #   Add to result
+        if len(itemCats)==len(catList):
+            result.append(item)
     return result
 
 
-#Parameter sortBy is a string representing how the inventory table should be sorted
-#   Values: 'amount', 'dairy', 'grain', 'snacks', etc.
 @app.route("/inventory", methods = ["POST", "GET"])
 def inventory():
-    inventoryList = sortInventoryByAmount(Inventory.query.all())
     if request.method == "POST":
         #If the form being submitted is the Add/Edit Items form at top of page:
         if "Item" in request.form:
+            print(request.form)
             item = request.form["Item"].title()
             amount = request.form["Amount"]
             note = request.form["Note"]
-            grain = ""
-            produce = ""
-            dairy = ""
-            snacks = ""
-            vegan = ""
-            vegetarian = ""
-            #Check form data to see if any categories have been checked, set values to 'on' if so
-            if "Grain" in request.form:
-                grain = "on"
-            if "Produce" in request.form:
-                produce = "on"
-            if "Dairy" in request.form:
-                dairy = "on"
-            if "Snacks" in request.form:
-                snacks = "on"
-            if "Vegan" in request.form:
-                vegan = "on"
-            if "Vegetarian" in request.form:
-                vegetarian = "on"
-            #Check to see if item already exists in database
-            foundItem = Inventory.query.filter_by(name = item).first()
+            #Check to see if item already exists in Items table
+            foundItem = Items.query.filter_by(name = item).first()
             #If item already exists or user didn't enter an amount:
             if foundItem or amount == "": 
-                Inventory.query.filter_by(name = item).delete()
+                Items.query.filter_by(name = item).delete()
                 #If user didn't enter an amount, automatically set item amount to 0
                 if amount == "":
                     amount = "0" 
             #Add info user entered into form to database
-            newEntry = Inventory(item, amount, note, grain, produce, dairy, snacks, vegan, vegetarian)
-            database.session.add(newEntry)
+            newItem = Items(item, amount, note)
+            database.session.add(newItem)
+            database.session.commit()
+            for catName in request.form:
+                if (catName != "Item") and (catName != "Amount") and (catName != "Note") and (catName != "Submit"):
+                    foundCat = Categories.query.filter_by(name = catName).first()
+                    foundCat.items.append(newItem)
             database.session.commit()
         #If user submits a form to filter inventory by categories
         elif "filterBy" in request.form:
@@ -272,31 +234,30 @@ def inventory():
                 if cat != "filterBy":
                     catList.append(cat)
             inventoryList = sortInventoryByCategory(catList)
-            return render_template("staff_inventory.html", values = inventoryList, editItemID = "None", auth=verify_staff(), user="Alex")
+            return goto_page_inventory(catList = Categories.query.all(), values = inventoryList, editItemID = "None")
         #If a 'Remove' button in the table is clicked:
         elif "removeItemID" in request.form:
             #Remove item from database and commit changes
             removedID = request.form["removeItemID"]
-            removedItem = Inventory.query.filter_by(_id = removedID).delete()
+            removedItem = Items.query.filter_by(id = removedID).delete()
             database.session.commit()
         #If an "edit" button in the table is clicked:
         elif "editItemID" in request.form:
             #Record the item id of the specific item to edit, return the template w/ this id as attribute for use in template
             editID = int(request.form["editItemID"])
-            return render_template("staff_inventory.html", values = inventoryList, editItemID = editID, auth=verify_staff(), user="Alex")
+            return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = editID)
         #If changes within the table are saved:
         elif "editedItemID" in request.form:
             #Assign vars to newly inputted values, assign to that item in the database and save
             editedID = request.form["editedItemID"]
             newName = request.form["newName"].title()
             newAmount = request.form["newAmount"]
-            item = Inventory.query.filter_by(_id = editedID).first()
+            item = Items.query.filter_by(id = editedID).first()
             item.name = newName
             item.amount = newAmount
             database.session.commit()
-
-    inventoryList = sortInventoryByAmount(Inventory.query.all())
-    return goto_page_inventory(values = sortInventoryByAmount(Inventory.query.all()), editItemID = "None")
+    return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = "None")
+    
 
 
 if __name__ == "__main__":

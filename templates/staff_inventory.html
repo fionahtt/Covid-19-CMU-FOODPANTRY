@@ -27,42 +27,14 @@
                             </div>
                     
                             <label>Category (check all that apply)</label>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "Grain"/>
-                                <span>Grain</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "Produce"/>
-                                <span>Produce</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                    <input type = "checkbox" class = "filled-in" name = "Dairy"/>
-                                    <span>Dairy</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "Snacks"/>
-                                <span>Snacks</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "Vegan"/>
-                                <span>Vegan</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "Vegetarian"/>
-                                <span>Vegetarian</span>
-                                </label>
-                            </p><br>
+                            {% for cat in catList %}
+                                <p>
+                                    <label>
+                                    <input type="checkbox" class="filled-in" name={{cat.name}} />
+                                    <span>{{cat.name}}</span>
+                                    </label>
+                                </p>
+                            {% endfor %}
 
                             <div class="input-field">
                                 <textarea id="note" class="materialize-textarea" name="Note"></textarea>
@@ -78,42 +50,14 @@
                     <div class="collapsible-header">Filter By:</div>
                     <div class="collapsible-body"><span>
                         <form action = "#" method = "post">
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "grain"/>
-                                <span>Grain</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "produce"/>
-                                <span>Produce</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                    <input type = "checkbox" class = "filled-in" name = "dairy"/>
-                                    <span>Dairy</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "snacks"/>
-                                <span>Snacks</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "vegan"/>
-                                <span>Vegan</span>
-                                </label>
-                            </p>
-                            <p>
-                                <label>
-                                <input type="checkbox" class="filled-in" name = "vegetarian"/>
-                                <span>Vegetarian</span>
-                                </label>
-                            </p><br>
+                            {% for cat in catList %}
+                                <p>
+                                    <label>
+                                    <input type="checkbox" class="filled-in" name={{cat.name}} />
+                                    <span>{{cat.name}}</span>
+                                    </label>
+                                </p>
+                            {% endfor %}
                             <button class="btn waves-effect waves-light" type="submit" name="filterBy">Go</button>
                         </form>
                     </span></div>
@@ -138,7 +82,7 @@
                     {% for item in values %}
                         <!-- Check if someone has clicked the edit button before, 
                             make a specific row editable by passing in item id and checking each one for a match -->
-                        {% if item._id == editItemID %}
+                        {% if item.id == editItemID %}
                             <tr>
                                 <form action="#" method="post">
                                     <td>
@@ -148,7 +92,7 @@
                                         <input type="number" name="newAmount" placeholder={{item.amount}} min="0" required>
                                     </td>
                                     <td>
-                                        <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item._id}}>Save</button>
+                                        <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item.id}}>Save</button>
                                     </td>
                                 </form>
                             </tr>
@@ -161,9 +105,9 @@
                                     <td>
                                         {% if item.note != "" %}
                                             <!-- Modal Trigger -->
-                                            <a class="waves-effect waves-light btn modal-trigger" href="#{{item._id}}">Note</a>
+                                            <a class="waves-effect waves-light btn modal-trigger" href="#{{item.id}}">Note</a>
                                             <!-- Modal Structure -->
-                                            <div id="{{item._id}}" class="modal">
+                                            <div id="{{item.id}}" class="modal">
                                                 <div class="modal-content">
                                                     <h4>Note:</h4>
                                                     <p>{{item.note}}</p>
@@ -176,12 +120,12 @@
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item._id}}>Edit</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item.id}}>Edit</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item._id}}>Remove</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item.id}}>Remove</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -192,9 +136,9 @@
                                     <td>
                                         {% if item.note != "" %}
                                             <!-- Modal Trigger -->
-                                            <a class="waves-effect waves-light btn modal-trigger" href="#{{item._id}}">Note</a>
+                                            <a class="waves-effect waves-light btn modal-trigger" href="#{{item.id}}">Note</a>
                                             <!-- Modal Structure -->
-                                            <div id="{{item._id}}" class="modal">
+                                            <div id="{{item.id}}" class="modal">
                                                 <div class="modal-content">
                                                     <h4>Note:</h4>
                                                     <p>{{item.note}}</p>
@@ -207,12 +151,12 @@
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item._id}}>Edit</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item.id}}>Edit</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item._id}}>Remove</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item.id}}>Remove</button>
                                         </form>
                                     </td>
                                 </tr>
