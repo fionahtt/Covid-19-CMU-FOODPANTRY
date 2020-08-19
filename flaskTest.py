@@ -178,20 +178,20 @@ def users():
 
 
 
-#Given a list of category names (ex: ["Grain", "Vegetarian"]), return a list of all items in inventory
+#Given a list of category IDs, return a list of all items in inventory
 #that fit under all categories in this list
 #   NOTE: Might wanna see if I could increase efficiency later
 def sortInventoryByCategory(catList):
     #Use a query to:    1) Create a preliminary filter, return all items that fit under first category in catList
     #                      This might reduce a bit of time compared to calling up ALL items in inventory
     #                   2) Sort this list by increasing amount, no more need for another sortInventoryByAmount function
-    inventoryList = Items.query.join(Categories, Items.categories).filter(Categories.name==catList[0]).order_by(Items.amount)
+    inventoryList = Items.query.join(Categories, Items.categories).filter(Categories.id==catList[0]).order_by(Items.amount)
     result = []
     for item in inventoryList:
         #Create a list of categories each item has that matches categories in catList
         itemCats = []
         for cat in item.categories:
-            if cat.name in catList:
+            if cat.id in catList:
                 itemCats.append(cat.name)
         #If the length of catList and itemCats is the same, that means this item fits all filters!
         #   Add to result
@@ -205,8 +205,7 @@ def inventory():
     if request.method == "POST":
         #If the form being submitted is the Add/Edit Items form at top of page:
         if "Item" in request.form:
-            print(request.form)
-            item = request.form["Item"].title()
+            item = request.form["Item"].title().strip()
             amount = request.form["Amount"]
             note = request.form["Note"]
             #Check to see if item already exists in Items table
@@ -221,18 +220,26 @@ def inventory():
             newItem = Items(item, amount, note)
             database.session.add(newItem)
             database.session.commit()
-            for catName in request.form:
-                if (catName != "Item") and (catName != "Amount") and (catName != "Note") and (catName != "Submit"):
-                    foundCat = Categories.query.filter_by(name = catName).first()
-                    foundCat.items.append(newItem)
+            for catID in request.form:
+                if (catID != "Item") and (catID != "Amount") and (catID != "Note") and (catID != "Submit"):
+                    foundCat = Categories.query.filter_by(id = catID).first()
+                    newItem.categories.append(foundCat)
             database.session.commit()
+        #If user submits form to add new category
+        elif "addCategory" in request.form:
+            catName = request.form["Category"].title().strip()
+            existingCat = Categories.query.filter_by(name=catName).first()
+            if not existingCat:
+                newCat = Categories(catName)
+                database.session.add(newCat)
+                database.session.commit()
         #If user submits a form to filter inventory by categories
         elif "filterBy" in request.form:
             catList = []
-            for cat in request.form:
+            for catID in request.form:
                 #filterBy is the submit button's name, so it's not a category
-                if cat != "filterBy":
-                    catList.append(cat)
+                if catID != "filterBy":
+                    catList.append(int(catID))
             inventoryList = sortInventoryByCategory(catList)
             return goto_page_inventory(catList = Categories.query.all(), values = inventoryList, editItemID = "None")
         #If a 'Remove' button in the table is clicked:
@@ -257,7 +264,6 @@ def inventory():
             item.amount = newAmount
             database.session.commit()
     return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = "None")
-    
 
 
 if __name__ == "__main__":
