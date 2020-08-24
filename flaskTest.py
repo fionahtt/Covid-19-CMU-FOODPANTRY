@@ -233,6 +233,12 @@ def inventory():
                 newCat = Categories(catName)
                 database.session.add(newCat)
                 database.session.commit()
+        #If user submits form to delete category
+        elif "removeCategory" in request.form:
+            for catID in request.form:
+                if catID != "removeCategory":
+                    Categories.query.filter_by(id=catID).delete()
+                    database.session.commit()
         #If user submits a form to filter inventory by categories
         elif "filterBy" in request.form:
             catList = []

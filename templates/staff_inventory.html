@@ -59,6 +59,22 @@
                     </span></div>
                 </li>
                 <li>
+                    <div class="collapsible-header">Remove Category</div>
+                    <div class="collapsible-body"><span>
+                        <form action = "#" method = "post">
+                            {% for cat in catList %}
+                                <p>
+                                    <label>
+                                    <input type="checkbox" class="filled-in" name={{cat.id}} />
+                                    <span>{{cat.name}}</span>
+                                    </label>
+                                </p>
+                            {% endfor %}
+                            <button class="btn waves-effect waves-light" type="submit" name="removeCategory">Go</button>
+                        </form>
+                    </span></div>
+                </li>
+                <li>
                     <div class="collapsible-header">Filter By:</div>
                     <div class="collapsible-body"><span>
                         <form action = "#" method = "post">
