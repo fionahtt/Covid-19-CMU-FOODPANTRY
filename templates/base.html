@@ -40,7 +40,6 @@
             <div class="nav-wrapper">
                 <ul id="nav-mobile" class="left hide-on-med-and-down">
                     {% if auth %}
-                        <!-- Small bug here: Home is always shown as the selected page in navbar, no matter what page you're on -->
                         {% block nav_content %}
                         {% include "staff_nav.html" %}
                         {% endblock %}
@@ -74,9 +73,7 @@
     <!-- Trying to autoscroll to items that the user edits, not working yet for some reason :/ -->
     {% if editItemID != "None" %}
         <script>
-            var element = document.getElementById("scrollTo");
-            element.scrollIntoView(true);
-            console.log({{editItemID}})
+            document.location.hash = "#scrollTo"
         </script>
     {% endif %}
             

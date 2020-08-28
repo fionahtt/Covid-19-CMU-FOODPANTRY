@@ -111,21 +111,19 @@
                         <!-- Check if someone has clicked the edit button before, 
                             make a specific row editable by passing in item id and checking each one for a match -->
                         {% if item.id == editItemID %}
-                            <div id="scrollTo">
-                                <tr>
-                                    <form action="#" method="post">
-                                        <td>
-                                            <input type="text" name="newName" placeholder={{item.name}} required>
-                                        </td>
-                                        <td>
-                                            <input type="number" name="newAmount" placeholder={{item.amount}} min="0" required>
-                                        </td>
-                                        <td>
-                                            <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item.id}}>Save</button>
-                                        </td>
-                                    </form>
-                                </tr>
-                            </div>
+                            <tr id="scrollTo">
+                                <form action="#" method="post">
+                                    <td>
+                                        <input type="text" name="newName" placeholder={{item.name}} required>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="newAmount" placeholder={{item.amount}} min="0" required>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item.id}}>Save</button>
+                                    </td>
+                                </form>
+                            </tr>
                         {% else %}
                             <!-- Row is light red if there are <= 5 items -->
                             {% if item.amount <= 5 %}
@@ -192,7 +190,6 @@
                                 </tr>
                             {% endif %}
                         {% endif %}
-                        
                     {% endfor %}  
                 </tbody>
             </table>
