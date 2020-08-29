@@ -30,7 +30,7 @@
                             {% for cat in catList %}
                                 <p>
                                     <label>
-                                    <input type="checkbox" class="filled-in" name={{cat.id}} />
+                                    <input type="checkbox" class="filled-in" name="{{cat.id}}" />
                                     <span>{{cat.name}}</span>
                                     </label>
                                 </p>
@@ -65,7 +65,7 @@
                             {% for cat in catList %}
                                 <p>
                                     <label>
-                                    <input type="checkbox" class="filled-in" name={{cat.id}} />
+                                    <input type="checkbox" class="filled-in" name="{{cat.id}}" />
                                     <span>{{cat.name}}</span>
                                     </label>
                                 </p>
@@ -81,7 +81,7 @@
                             {% for cat in catList %}
                                 <p>
                                     <label>
-                                    <input type="checkbox" class="filled-in" name={{cat.id}} />
+                                    <input type="checkbox" class="filled-in" name="{{cat.id}}" />
                                     <span>{{cat.name}}</span>
                                     </label>
                                 </p>
@@ -90,8 +90,13 @@
                         </form>
                     </span></div>
                 </li>
-            </ul><br>
-
+            </ul>
+            <h7 class="blue-text">Current Filters:</h7>
+            <ul class="blue-text">
+                {% for cat in filters %}
+                    <li class="center-align">{{cat}}</li>
+                {% endfor %}
+            </ul>
         </div>
         
         <!-- INVENTORY TABLE -->
@@ -114,13 +119,13 @@
                             <tr id="scrollTo">
                                 <form action="#" method="post">
                                     <td>
-                                        <input type="text" name="newName" placeholder={{item.name}} required>
+                                        <input type="text" name="newName" value="{{item.name}}" required>
                                     </td>
                                     <td>
-                                        <input type="number" name="newAmount" placeholder={{item.amount}} min="0" required>
+                                        <input type="number" name="newAmount" value="{{item.amount}}" min="0" required>
                                     </td>
                                     <td>
-                                        <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value={{item.id}}>Save</button>
+                                        <button type="submit" class="waves-effect waves-light btn-small" formmethod="post" formaction="#" name="editedItemID" value="{{item.id}}">Save</button>
                                     </td>
                                 </form>
                             </tr>
@@ -148,12 +153,12 @@
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item.id}}>Edit</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value="{{item.id}}">Edit</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item.id}}>Remove</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value="{{item.id}}">Remove</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -179,12 +184,12 @@
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value={{item.id}}>Edit</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="editItemID" value="{{item.id}}">Edit</button>
                                         </form>
                                     </td>
                                     <td>
                                         <form action="#" method="post">
-                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value={{item.id}}>Remove</button>
+                                            <button type="submit" class="waves-effect waves-teal btn-flat" formmethod="post" formaction="#" name="removeItemID" value="{{item.id}}">Remove</button>
                                         </form>
                                     </td>
                                 </tr>

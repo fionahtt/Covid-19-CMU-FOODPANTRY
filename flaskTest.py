@@ -92,9 +92,9 @@ def goto_page(s):
     return render_template(s, auth=sd[0], user=sd[1])
 
 # TODO TODO temporary bandaid, will change later
-def goto_page_inventory(catList, values, editItemID):
+def goto_page_inventory(catList, values, editItemID, filters):
     sd = get_session_display()
-    return render_template("staff_inventory.html", catList=catList, values=values, editItemID=editItemID, auth=sd[0], user=sd[1])
+    return render_template("staff_inventory.html", catList=catList, values=values, editItemID=editItemID, filters=filters, auth=sd[0], user=sd[1])
 
 def goto_page_users(values):
     sd = get_session_display()
@@ -241,13 +241,21 @@ def inventory():
                     database.session.commit()
         #If user submits a form to filter inventory by categories
         elif "filterBy" in request.form:
-            catList = []
+            #catIDList is for the function, filterInventoryByCategory, catNameList is to display current filters under the collapsible
+            catIDList = []
+            catNameList = []
             for catID in request.form:
                 #filterBy is the submit button's name, so it's not a category
                 if catID != "filterBy":
-                    catList.append(int(catID))
-            inventoryList = sortInventoryByCategory(catList)
-            return goto_page_inventory(catList = Categories.query.all(), values = inventoryList, editItemID = "None")
+                    catIDList.append(int(catID))
+                    catObject = Categories.query.filter_by(id=catID).first()
+                    catName = catObject.name
+                    catNameList.append(catName)
+            print(catNameList)
+            if catIDList == []:
+                return goto_page_inventory(catList=Categories.query.all(), values=Items.query.order_by(Items.amount).all(), editItemID="None", filters=["None"])
+            inventoryList = sortInventoryByCategory(catIDList)
+            return goto_page_inventory(catList=Categories.query.all(), values=inventoryList, editItemID="None", filters=catNameList)
         #If a 'Remove' button in the table is clicked:
         elif "removeItemID" in request.form:
             #Remove item from database and commit changes
@@ -258,7 +266,7 @@ def inventory():
         elif "editItemID" in request.form:
             #Record the item id of the specific item to edit, return the template w/ this id as attribute for use in template
             editID = int(request.form["editItemID"])
-            return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = editID)
+            return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = editID, filters=["None"])
         #If changes within the table are saved:
         elif "editedItemID" in request.form:
             #Assign vars to newly inputted values, assign to that item in the database and save
@@ -269,7 +277,7 @@ def inventory():
             item.name = newName
             item.amount = newAmount
             database.session.commit()
-    return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = "None")
+    return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = "None", filters=["None"])
 
 
 if __name__ == "__main__":
