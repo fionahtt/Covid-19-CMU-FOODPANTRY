@@ -178,20 +178,20 @@ def users():
 
 
 
-#Given a list of category IDs, return a list of all items in inventory
+#Given a list of category names, return a list of all items in inventory
 #that fit under all categories in this list
 #   NOTE: Might wanna see if I could increase efficiency later
 def sortInventoryByCategory(catList):
     #Use a query to:    1) Create a preliminary filter, return all items that fit under first category in catList
     #                      This might reduce a bit of time compared to calling up ALL items in inventory
     #                   2) Sort this list by increasing amount, no more need for another sortInventoryByAmount function
-    inventoryList = Items.query.join(Categories, Items.categories).filter(Categories.id==catList[0]).order_by(Items.amount)
+    inventoryList = Items.query.join(Categories, Items.categories).filter(Categories.name==catList[0]).order_by(Items.amount)
     result = []
     for item in inventoryList:
         #Create a list of categories each item has that matches categories in catList
         itemCats = []
         for cat in item.categories:
-            if cat.id in catList:
+            if cat.name in catList:
                 itemCats.append(cat.name)
         #If the length of catList and itemCats is the same, that means this item fits all filters!
         #   Add to result
@@ -199,11 +199,17 @@ def sortInventoryByCategory(catList):
             result.append(item)
     return result
 
+#Helper function to create a dictionary w/ {category name}: {amt of items under category} key-value pairs
+def createCatDic():
+    catDic = {}
+    for cat in Categories.query.all():
+        catDic[cat.name] = Items.query.join(Categories, Items.categories).filter(Categories.id==cat.id).count()
+    return catDic
 
 @app.route("/inventory", methods = ["POST", "GET"])
 def inventory():
     if request.method == "POST":
-        #If the form being submitted is the Add/Edit Items form at top of page:
+        #If the form being submitted is the Add/Edit Items form at top of collapsible:
         if "Item" in request.form:
             item = request.form["Item"].title().strip()
             amount = request.form["Amount"]
@@ -211,18 +217,19 @@ def inventory():
             #Check to see if item already exists in Items table
             foundItem = Items.query.filter_by(name = item).first()
             #If item already exists or user didn't enter an amount:
-            if foundItem or amount == "": 
+            if foundItem:
+                foundItem.categories = []
                 Items.query.filter_by(name = item).delete()
-                #If user didn't enter an amount, automatically set item amount to 0
-                if amount == "":
-                    amount = "0" 
+            #If user didn't enter an amount, automatically set item amount to 0
+            if amount == "":
+                amount = "0" 
             #Add info user entered into form to database
             newItem = Items(item, amount, note)
             database.session.add(newItem)
             database.session.commit()
-            for catID in request.form:
-                if (catID != "Item") and (catID != "Amount") and (catID != "Note") and (catID != "Submit"):
-                    foundCat = Categories.query.filter_by(id = catID).first()
+            for cat in request.form:
+                if (cat != "Item") and (cat != "Amount") and (cat != "Note") and (cat != "Submit"):
+                    foundCat = Categories.query.filter_by(name=cat).first()
                     newItem.categories.append(foundCat)
             database.session.commit()
         #If user submits form to add new category
@@ -235,38 +242,37 @@ def inventory():
                 database.session.commit()
         #If user submits form to delete category
         elif "removeCategory" in request.form:
-            for catID in request.form:
-                if catID != "removeCategory":
-                    Categories.query.filter_by(id=catID).delete()
+            for catName in request.form:
+                if catName != "removeCategory":
+                    Categories.query.filter_by(name=catName).delete()
                     database.session.commit()
         #If user submits a form to filter inventory by categories
         elif "filterBy" in request.form:
-            #catIDList is for the function, filterInventoryByCategory, catNameList is to display current filters under the collapsible
-            catIDList = []
             catNameList = []
-            for catID in request.form:
+            for catName in request.form:
                 #filterBy is the submit button's name, so it's not a category
-                if catID != "filterBy":
-                    catIDList.append(int(catID))
-                    catObject = Categories.query.filter_by(id=catID).first()
-                    catName = catObject.name
+                if catName != "filterBy":
                     catNameList.append(catName)
-            print(catNameList)
-            if catIDList == []:
-                return goto_page_inventory(catList=Categories.query.all(), values=Items.query.order_by(Items.amount).all(), editItemID="None", filters=["None"])
-            inventoryList = sortInventoryByCategory(catIDList)
-            return goto_page_inventory(catList=Categories.query.all(), values=inventoryList, editItemID="None", filters=catNameList)
+            if catNameList == []:
+                return goto_page_inventory(catList=createCatDic(), values=Items.query.order_by(Items.amount).all(), editItemID="None", filters=["None"])
+            inventoryList = sortInventoryByCategory(catNameList)
+            return goto_page_inventory(catList=createCatDic(), values=inventoryList, editItemID="None", filters=catNameList)
         #If a 'Remove' button in the table is clicked:
         elif "removeItemID" in request.form:
-            #Remove item from database and commit changes
+            #Remove all item-category associations before removing the item itself:
             removedID = request.form["removeItemID"]
+            removedItem = Items.query.filter_by(id = removedID).first()
+            removedItem.categories = []
+            #Note sure if this line is really needed, will check later...
+            database.session.commit()
+            #Remove the item itself from database
             removedItem = Items.query.filter_by(id = removedID).delete()
             database.session.commit()
         #If an "edit" button in the table is clicked:
         elif "editItemID" in request.form:
             #Record the item id of the specific item to edit, return the template w/ this id as attribute for use in template
             editID = int(request.form["editItemID"])
-            return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = editID, filters=["None"])
+            return goto_page_inventory(catList=createCatDic(), values=Items.query.order_by(Items.amount).all(), editItemID=editID, filters=["None"])
         #If changes within the table are saved:
         elif "editedItemID" in request.form:
             #Assign vars to newly inputted values, assign to that item in the database and save
@@ -277,7 +283,7 @@ def inventory():
             item.name = newName
             item.amount = newAmount
             database.session.commit()
-    return goto_page_inventory(catList = Categories.query.all(), values = Items.query.order_by(Items.amount).all(), editItemID = "None", filters=["None"])
+    return goto_page_inventory(catList=createCatDic(), values=Items.query.order_by(Items.amount).all(), editItemID="None", filters=["None"])
 
 
 if __name__ == "__main__":

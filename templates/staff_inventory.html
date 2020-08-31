@@ -30,8 +30,8 @@
                             {% for cat in catList %}
                                 <p>
                                     <label>
-                                    <input type="checkbox" class="filled-in" name="{{cat.id}}" />
-                                    <span>{{cat.name}}</span>
+                                    <input type="checkbox" class="filled-in" name="{{cat}}" />
+                                    <span>{{cat}}</span>
                                     </label>
                                 </p>
                             {% endfor %}
@@ -64,9 +64,9 @@
                         <form action = "#" method = "post">
                             {% for cat in catList %}
                                 <p>
-                                    <label>
-                                    <input type="checkbox" class="filled-in" name="{{cat.id}}" />
-                                    <span>{{cat.name}}</span>
+                                    <label class="red-text">
+                                    <input type="checkbox" class="filled-in" name="{{cat}}" />
+                                    <span>{{cat}} ({{catList[cat]}})</span>
                                     </label>
                                 </p>
                             {% endfor %}
@@ -81,8 +81,8 @@
                             {% for cat in catList %}
                                 <p>
                                     <label>
-                                    <input type="checkbox" class="filled-in" name="{{cat.id}}" />
-                                    <span>{{cat.name}}</span>
+                                    <input type="checkbox" class="filled-in" name="{{cat}}" />
+                                    <span>{{cat}} ({{catList[cat]}})</span>
                                     </label>
                                 </p>
                             {% endfor %}
